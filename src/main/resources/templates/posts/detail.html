@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/default :: layout(~{::section})}">
+<head>
+    <title>게시글 상세</title>
+</head>
+<body>
+    <section>
+        <h1 th:text="${post.title}"></h1>
+        <div class="text-muted mb-3">
+            <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+        </div>
+        <div class="card mb-3">
+            <div class="card-body">
+                <p class="card-text" th:text="${post.content}"></p>
+            </div>
+        </div>
+        <div class="text-end">
+            <a href="/posts" class="btn btn-secondary">목록</a>
+            <a th:href="@{/posts/{id}/edit(id=${post.id})}" class="btn btn-primary">수정</a>
+            <form th:action="@{/posts/{id}/delete(id=${post.id})}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
+            </form>
+        </div>
+    </section>
+</body>
+</html> 
