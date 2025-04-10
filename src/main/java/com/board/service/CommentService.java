@@ -11,12 +11,15 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CommentService {
     private final CommentRepository commentRepository;
 
     public List<Comment> findByPostId(Long postId) {
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
+    }
+
+    public List<Comment> findAllByPostId(Long postId) {
+        return commentRepository.findAllByPostId(postId);
     }
 
     @Transactional

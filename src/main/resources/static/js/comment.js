@@ -1,5 +1,6 @@
 function createComment(postId, parentId = null) {
-    const content = document.getElementById('commentContent').value;
+    const contentId = parentId ? `replyContent-${parentId}` : 'commentContent';
+    const content = document.getElementById(contentId).value;
     if (!content.trim()) {
         alert('댓글 내용을 입력해주세요.');
         return;

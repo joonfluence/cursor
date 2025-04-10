@@ -28,12 +28,12 @@
             <!-- 댓글 작성 폼 -->
             <div class="card mb-3">
                 <div class="card-body">
-                    <form onsubmit="createComment(${post.id});">
+                    <form>
                         <div class="mb-3">
                             <textarea class="form-control" id="commentContent" rows="3" maxlength="500" required></textarea>
                             <small class="text-muted">최대 500자까지 입력 가능합니다.</small>
                         </div>
-                        <button type="submit" class="btn btn-primary">댓글 작성</button>
+                        <button id="commentSubmitBtn" type="button" class="btn btn-primary" th:attr="data-post-id=${post.id}">댓글 작성</button>
                     </form>
                 </div>
             </div>
@@ -45,8 +45,8 @@
                         <p class="card-text" th:text="${comment.content}"></p>
                         <div class="text-muted small">
                             <span th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
-                            <button class="btn btn-link btn-sm" th:onclick="'showReplyForm(' + ${comment.id} + ')'">답글</button>
-                            <button class="btn btn-link btn-sm" th:onclick="'deleteComment(' + ${comment.id} + ')'">삭제</button>
+                            <button class="btn btn-link btn-sm reply-btn" th:attr="data-comment-id=${comment.id}">답글</button>
+                            <button class="btn btn-link btn-sm delete-btn" th:attr="data-comment-id=${comment.id}">삭제</button>
                         </div>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                 <div class="ms-4" th:id="'replyForm-' + ${comment.id}" style="display: none;">
                     <div class="card mb-2">
                         <div class="card-body">
-                            <form onsubmit="createComment(${post.id}, ${comment.id});">
+                            <form class="reply-form" th:attr="data-post-id=${post.id},data-parent-id=${comment.id}">
                                 <div class="mb-3">
                                     <textarea class="form-control" th:id="'replyContent-' + ${comment.id}" rows="2" maxlength="500" required></textarea>
                                     <small class="text-muted">최대 500자까지 입력 가능합니다.</small>
@@ -73,7 +73,7 @@
                             <p class="card-text" th:text="${reply.content}"></p>
                             <div class="text-muted small">
                                 <span th:text="${#temporals.format(reply.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
-                                <button class="btn btn-link btn-sm" th:onclick="'deleteComment(' + ${reply.id} + ')'">삭제</button>
+                                <button class="btn btn-link btn-sm delete-btn" th:attr="data-comment-id=${reply.id}">삭제</button>
                             </div>
                         </div>
                     </div>
@@ -81,12 +81,42 @@
             </div>
         </div>
     </section>
+    <script src="/js/comment.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 댓글 작성 버튼 이벤트
+            const commentBtn = document.getElementById('commentSubmitBtn');
+            commentBtn?.addEventListener('click', () => {
+                const postId = commentBtn.dataset.postId;
+                createComment(postId);
+            });
 
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        const postId = /*[[${post.id}]]*/ 0;
-        /*]]>*/
+            // 답글 버튼 이벤트
+            document.querySelectorAll('.reply-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const commentId = btn.dataset.commentId;
+                    showReplyForm(commentId);
+                });
+            });
+
+            // 삭제 버튼 이벤트
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const commentId = btn.dataset.commentId;
+                    deleteComment(commentId);
+                });
+            });
+
+            // 답글 폼 제출 이벤트
+            document.querySelectorAll('.reply-form').forEach(form => {
+                form.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    const postId = form.dataset.postId;
+                    const parentId = form.dataset.parentId;
+                    createComment(postId, parentId);
+                });
+            });
+        });
     </script>
-    <script src="/js/comment.js" defer></script>
 </body>
 </html> 
