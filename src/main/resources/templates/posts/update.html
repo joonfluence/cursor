@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/default :: layout(~{::section})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/default :: layout(~{::section}, ~{::script})}">
 <head>
     <title>게시글 수정</title>
 </head>
@@ -21,5 +21,10 @@
             </div>
         </form>
     </section>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // 필요한 JavaScript 코드가 있다면 여기에 추가
+        /*]]>*/
+    </script>
 </body>
 </html> 
