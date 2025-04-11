@@ -1,7 +1,12 @@
 package com.board.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -10,6 +15,9 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @EntityListeners(AuditingEntityListener.class)
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +33,6 @@ public class Comment {
     private Long postId;
 
     private Long parentId;
-
-    protected Comment() {}
 
     public static Comment create(String content, Long postId, Long parentId) {
         Comment comment = new Comment();
