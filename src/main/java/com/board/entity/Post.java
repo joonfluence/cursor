@@ -1,6 +1,7 @@
 package com.board.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -10,8 +11,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @EntityListeners(AuditingEntityListener.class)
+@AllArgsConstructor
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +27,9 @@ public class Post {
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
-} 
+
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+}

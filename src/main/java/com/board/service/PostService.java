@@ -31,8 +31,7 @@ public class PostService {
     @Transactional
     public Post update(Long id, Post post) {
         Post existingPost = findById(id);
-        existingPost.setTitle(post.getTitle());
-        existingPost.setContent(post.getContent());
+        existingPost.update(post.getTitle(), post.getContent());
         return existingPost;
     }
 
