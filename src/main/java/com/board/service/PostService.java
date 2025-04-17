@@ -1,6 +1,6 @@
 package com.board.service;
 
-import com.board.entity.Post;
+import com.board.entity.PostEntity;
 import com.board.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,23 +14,23 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
 
-    public List<Post> findAll() {
+    public List<PostEntity> findAll() {
         return postRepository.findAll();
     }
 
-    public Post findById(Long id) {
+    public PostEntity findById(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
     }
 
     @Transactional
-    public Post save(Post post) {
+    public PostEntity save(PostEntity post) {
         return postRepository.save(post);
     }
 
     @Transactional
-    public Post update(Long id, Post post) {
-        Post existingPost = findById(id);
+    public PostEntity update(Long id, PostEntity post) {
+        PostEntity existingPost = findById(id);
         existingPost.update(post.getTitle(), post.getContent());
         return existingPost;
     }

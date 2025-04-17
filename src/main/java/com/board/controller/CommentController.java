@@ -1,7 +1,7 @@
 package com.board.controller;
 
 import com.board.dto.CommentDto;
-import com.board.entity.Comment;
+import com.board.entity.CommentEntity;
 import com.board.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +17,14 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/posts/{postId}")
-    public ResponseEntity<List<Comment>> getComments(@PathVariable Long postId) {
-        return ResponseEntity.ok(commentService.findByPostId(postId));
+    public ResponseEntity<List<CommentEntity>> getComments(
+            @PathVariable Long postId,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+        return ResponseEntity.ok(commentService.findByPostId(postId, sortOrder));
     }
 
     @PostMapping("/posts/{postId}")
-    public ResponseEntity<Comment> createComment(
+    public ResponseEntity<CommentEntity> createComment(
             @PathVariable Long postId,
             @RequestBody @Validated CommentDto commentDto) {
         return ResponseEntity.ok(commentService.create(commentDto));
@@ -39,6 +41,12 @@ public class CommentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
         commentService.delete(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/pin")
+    public ResponseEntity<Void> togglePin(@PathVariable Long id) {
+        commentService.togglePin(id);
         return ResponseEntity.ok().build();
     }
 }

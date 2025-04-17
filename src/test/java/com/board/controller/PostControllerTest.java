@@ -1,6 +1,6 @@
 package com.board.controller;
 
-import com.board.entity.Post;
+import com.board.entity.PostEntity;
 import com.board.service.PostService;
 import com.board.service.CommentService;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,8 +39,8 @@ class PostControllerTest {
     @DisplayName("GET /posts 요청 시 정상 200 응답과 JSON 응답이 와야 함")
     void list() throws Exception {
         // given
-        Post post1 = new Post(null, "제목1", "내용1", null);
-        Post post2 = new Post(null, "제목2", "내용2", null);
+        PostEntity post1 = new PostEntity(null, "제목1", "내용1", null);
+        PostEntity post2 = new PostEntity(null, "제목2", "내용2", null);
 
         given(postService.findAll()).willReturn(Arrays.asList(post1, post2));
 
@@ -55,7 +55,7 @@ class PostControllerTest {
     @DisplayName("게시글 상세 조회")
     void detail() throws Exception {
         // given
-        Post post = new Post(1L, "제목", "내용", null);
+        PostEntity post = new PostEntity(1L, "제목", "내용", null);
 
         given(postService.findById(1L)).willReturn(post);
 
@@ -71,7 +71,7 @@ class PostControllerTest {
     @DisplayName("게시글 수정 폼")
     void updateForm() throws Exception {
         // given
-        Post post = new Post(1L, "제목", "내용", null);
+        PostEntity post = new PostEntity(1L, "제목", "내용", null);
 
         given(postService.findById(1L)).willReturn(post);
 

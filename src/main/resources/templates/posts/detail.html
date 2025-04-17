@@ -1,121 +1,194 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/default :: layout(~{::section}, ~{::script})}">
 <head>
+    <meta charset="UTF-8">
     <title>게시글 상세</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .comment-section {
+            margin-top: 2rem;
+        }
+        .comment-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .comment-item.pinned {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .comment-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .sort-options {
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 <body>
     <section>
-        <h1 th:text="${post.title}"></h1>
+        <h1 th:text="${post?.title}"></h1>
         <div class="text-muted mb-3">
-            <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+            <span th:text="${#temporals.format(post?.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
         </div>
         <div class="card mb-3">
             <div class="card-body">
-                <p class="card-text" th:text="${post.content}"></p>
+                <p class="card-text" th:text="${post?.content}"></p>
             </div>
         </div>
         <div class="text-end">
             <a href="/posts" class="btn btn-secondary">목록</a>
-            <a th:href="@{/posts/{id}/edit(id=${post.id})}" class="btn btn-primary">수정</a>
-            <form th:action="@{/posts/{id}/delete(id=${post.id})}" method="post" class="d-inline">
+            <a th:href="@{/posts/{id}/edit(id=${post?.id})}" class="btn btn-primary">수정</a>
+            <form th:action="@{/posts/{id}/delete(id=${post?.id})}" method="post" class="d-inline">
                 <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
             </form>
         </div>
 
         <!-- 댓글 섹션 -->
-        <div class="mt-5">
+        <div class="comment-section">
             <h3>댓글</h3>
-            <!-- 댓글 작성 폼 -->
-            <div class="card mb-3">
-                <div class="card-body">
-                    <form>
-                        <div class="mb-3">
-                            <textarea class="form-control" id="commentContent" rows="3" maxlength="500" required></textarea>
-                            <small class="text-muted">최대 500자까지 입력 가능합니다.</small>
-                        </div>
-                        <button id="commentSubmitBtn" type="button" class="btn btn-primary" th:attr="data-post-id=${post.id}">댓글 작성</button>
-                    </form>
+            
+            <!-- 정렬 옵션 -->
+            <div class="sort-options">
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="sortOrder" id="sortAsc" value="asc" checked>
+                    <label class="btn btn-outline-primary" for="sortAsc">오래된순</label>
+                    
+                    <input type="radio" class="btn-check" name="sortOrder" id="sortDesc" value="desc">
+                    <label class="btn btn-outline-primary" for="sortDesc">최신순</label>
                 </div>
             </div>
 
             <!-- 댓글 목록 -->
-            <div th:each="comment : ${comments}" th:if="${comment.parentId == null}">
-                <div class="card mb-2">
-                    <div class="card-body">
-                        <p class="card-text" th:text="${comment.content}"></p>
-                        <div class="text-muted small">
-                            <span th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
-                            <button class="btn btn-link btn-sm reply-btn" th:attr="data-comment-id=${comment.id}">답글</button>
-                            <button class="btn btn-link btn-sm delete-btn" th:attr="data-comment-id=${comment.id}">삭제</button>
+            <div id="commentList">
+                <div th:each="comment : ${comments}" 
+                     class="comment-item" 
+                     th:classappend="${comment?.pinned} ? 'pinned' : ''"
+                     th:data-id="${comment?.id}">
+                    <div class="comment-header">
+                        <div>
+                            <span th:text="${comment?.content}"></span>
+                            <small class="text-muted ms-2" th:text="${#temporals.format(comment?.createdAt, 'yyyy-MM-dd HH:mm')}"></small>
                         </div>
-                    </div>
-                </div>
-
-                <!-- 대댓글 작성 폼 -->
-                <div class="ms-4" th:id="'replyForm-' + ${comment.id}" style="display: none;">
-                    <div class="card mb-2">
-                        <div class="card-body">
-                            <form class="reply-form" th:attr="data-post-id=${post.id},data-parent-id=${comment.id}">
-                                <div class="mb-3">
-                                    <textarea class="form-control" th:id="'replyContent-' + ${comment.id}" rows="2" maxlength="500" required></textarea>
-                                    <small class="text-muted">최대 500자까지 입력 가능합니다.</small>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-sm">답글 작성</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 대댓글 목록 -->
-                <div class="ms-4" th:each="reply : ${comments}" th:if="${reply.parentId == comment.id}">
-                    <div class="card mb-2">
-                        <div class="card-body">
-                            <p class="card-text" th:text="${reply.content}"></p>
-                            <div class="text-muted small">
-                                <span th:text="${#temporals.format(reply.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
-                                <button class="btn btn-link btn-sm delete-btn" th:attr="data-comment-id=${reply.id}">삭제</button>
-                            </div>
+                        <div class="comment-actions">
+                            <button class="btn btn-sm btn-outline-primary pin-btn" 
+                                    th:data-id="${comment?.id}">
+                                <span th:text="${comment?.pinned} ? '고정해제' : '고정'"></span>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-btn" 
+                                    th:data-id="${comment?.id}">
+                                삭제
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- 댓글 작성 폼 -->
+            <form id="commentForm" class="mt-4">
+                <div class="mb-3">
+                    <textarea class="form-control" id="commentContent" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">댓글 작성</button>
+            </form>
         </div>
     </section>
     <script src="/js/comment.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // 댓글 작성 버튼 이벤트
-            const commentBtn = document.getElementById('commentSubmitBtn');
-            commentBtn?.addEventListener('click', () => {
-                const postId = commentBtn.dataset.postId;
-                createComment(postId);
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            const postId = /*[[${post?.id}]]*/ 0;
+            let currentSortOrder = 'asc';
+
+            // 정렬 옵션 변경 이벤트
+            $('input[name="sortOrder"]').change(function() {
+                currentSortOrder = $(this).val();
+                loadComments();
             });
 
-            // 답글 버튼 이벤트
-            document.querySelectorAll('.reply-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const commentId = btn.dataset.commentId;
-                    showReplyForm(commentId);
+            // 댓글 목록 로드
+            function loadComments() {
+                $.get(`/api/comments/posts/${postId}?sortOrder=${currentSortOrder}`, function(comments) {
+                    const commentList = $('#commentList');
+                    commentList.empty();
+                    
+                    comments.forEach(comment => {
+                        const commentHtml = `
+                            <div class="comment-item ${comment.pinned ? 'pinned' : ''}" data-id="${comment.id}">
+                                <div class="comment-header">
+                                    <div>
+                                        <span>${comment.content}</span>
+                                        <small class="text-muted ms-2">${new Date(comment.createdAt).toLocaleString()}</small>
+                                    </div>
+                                    <div class="comment-actions">
+                                        <button class="btn btn-sm btn-outline-primary pin-btn" data-id="${comment.id}">
+                                            ${comment.pinned ? '고정해제' : '고정'}
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${comment.id}">
+                                            삭제
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        commentList.append(commentHtml);
+                    });
+                });
+            }
+
+            // 댓글 작성
+            $('#commentForm').submit(function(e) {
+                e.preventDefault();
+                const content = $('#commentContent').val();
+                
+                $.ajax({
+                    url: `/api/comments/posts/${postId}`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        content: content,
+                        postId: postId,
+                        parentId: null,
+                        isPinned: false,
+                        sortOrder: currentSortOrder
+                    }),
+                    success: function() {
+                        $('#commentContent').val('');
+                        loadComments();
+                    }
                 });
             });
 
-            // 삭제 버튼 이벤트
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const commentId = btn.dataset.commentId;
-                    deleteComment(commentId);
+            // 댓글 고정/해제
+            $(document).on('click', '.pin-btn', function() {
+                const commentId = $(this).data('id');
+                $.post(`/api/comments/${commentId}/pin`, function() {
+                    loadComments();
                 });
             });
 
-            // 답글 폼 제출 이벤트
-            document.querySelectorAll('.reply-form').forEach(form => {
-                form.addEventListener('submit', (event) => {
-                    event.preventDefault();
-                    const postId = form.dataset.postId;
-                    const parentId = form.dataset.parentId;
-                    createComment(postId, parentId);
-                });
+            // 댓글 삭제
+            $(document).on('click', '.delete-btn', function() {
+                const commentId = $(this).data('id');
+                if (confirm('댓글을 삭제하시겠습니까?')) {
+                    $.ajax({
+                        url: `/api/comments/${commentId}`,
+                        method: 'DELETE',
+                        success: function() {
+                            loadComments();
+                        }
+                    });
+                }
             });
+
+            // 초기 댓글 로드
+            loadComments();
         });
     </script>
 </body>
