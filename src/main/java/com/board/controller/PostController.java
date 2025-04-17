@@ -1,6 +1,6 @@
 package com.board.controller;
 
-import com.board.entity.Post;
+import com.board.entity.PostEntity;
 import com.board.service.PostService;
 import com.board.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class PostController {
     }
 
     @PostMapping("/new")
-    public String create(@ModelAttribute Post post) {
+    public String create(@ModelAttribute PostEntity post) {
         postService.save(post);
         return "redirect:/posts";
     }
@@ -46,7 +46,7 @@ public class PostController {
     }
 
     @PostMapping("/{id}/edit")
-    public String update(@PathVariable Long id, @ModelAttribute Post post) {
+    public String update(@PathVariable Long id, @ModelAttribute PostEntity post) {
         postService.update(id, post);
         return "redirect:/posts/" + id;
     }

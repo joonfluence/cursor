@@ -1,7 +1,7 @@
 package com.board.controller;
 
 import com.board.dto.CommentDto;
-import com.board.entity.Comment;
+import com.board.entity.CommentEntity;
 import com.board.service.CommentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,17 +40,17 @@ class CommentControllerTest {
     @DisplayName("게시글의 댓글 목록 조회")
     void getComments() throws Exception {
         // given
-        Comment comment1 = Comment.builder()
+        CommentEntity comment1 = CommentEntity.builder()
                 .id(1L)
                 .content("댓글1")
                 .build();
 
-        Comment comment2 = Comment.builder()
+        CommentEntity comment2 = CommentEntity.builder()
                 .id(2L)
                 .content("댓글2")
                 .build();
 
-        given(commentService.findByPostId(1L)).willReturn(Arrays.asList(comment1, comment2));
+        given(commentService.findByPostId(1L, "asc")).willReturn(Arrays.asList(comment1, comment2));
 
         // when & then
         mockMvc.perform(get("/api/comments/posts/1"))
@@ -69,7 +69,7 @@ class CommentControllerTest {
                 .postId(1L)
                 .build();
 
-        Comment savedComment = Comment.builder()
+        CommentEntity savedComment = CommentEntity.builder()
                 .id(1L)
                 .content("새 댓글")
                 .build();

@@ -1,6 +1,6 @@
 package com.board.service;
 
-import com.board.entity.Post;
+import com.board.entity.PostEntity;
 import com.board.repository.PostRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,10 +27,10 @@ class PostServiceTest {
     @DisplayName("게시글 생성 시 createdAt이 null이 아니어야 함")
     void createPost() {
         // given
-        Post post = new Post(null, "테스트 제목", "테스트 내용", null);
+        PostEntity post = new PostEntity(null, "테스트 제목", "테스트 내용", null);
 
         // when
-        Post savedPost = postService.save(post);
+        PostEntity savedPost = postService.save(post);
 
         // then
         assertThat(savedPost.getCreatedAt()).isNotNull();
@@ -40,14 +40,14 @@ class PostServiceTest {
     @DisplayName("게시글 목록 조회")
     void findAll() {
         // given
-        Post post1 = new Post(null, "제목1", "내용1", null);
+        PostEntity post1 = new PostEntity(null, "제목1", "내용1", null);
         postRepository.save(post1);
 
-        Post post2 = new Post(null, "제목2", "내용2", null);
+        PostEntity post2 = new PostEntity(null, "제목2", "내용2", null);
         postRepository.save(post2);
 
         // when
-        List<Post> posts = postService.findAll();
+        List<PostEntity> posts = postService.findAll();
 
         // then
         assertThat(posts).hasSize(2);
@@ -66,13 +66,13 @@ class PostServiceTest {
     @DisplayName("게시글 수정")
     void update() {
         // given
-        Post post = new Post(null, "원래 제목", "원래 내용", null);
-        Post savedPost = postRepository.save(post);
+        PostEntity post = new PostEntity(null, "원래 제목", "원래 내용", null);
+        PostEntity savedPost = postRepository.save(post);
 
-        Post updatePost = new Post(null, "수정된 제목", "수정된 내용", null);
+        PostEntity updatePost = new PostEntity(null, "수정된 제목", "수정된 내용", null);
 
         // when
-        Post updatedPost = postService.update(savedPost.getId(), updatePost);
+        PostEntity updatedPost = postService.update(savedPost.getId(), updatePost);
 
         // then
         assertThat(updatedPost.getTitle()).isEqualTo("수정된 제목");
@@ -83,8 +83,8 @@ class PostServiceTest {
     @DisplayName("게시글 삭제")
     void delete() {
         // given
-        Post post = new Post(null, "삭제할 게시글", "삭제할 내용", null);
-        Post savedPost = postRepository.save(post);
+        PostEntity post = new PostEntity(null, "삭제할 게시글", "삭제할 내용", null);
+        PostEntity savedPost = postRepository.save(post);
 
         // when
         postService.delete(savedPost.getId());

@@ -14,10 +14,14 @@ public class CommentDto {
 
     private Long postId;
     private Long parentId;
+    private boolean isPinned;
+    private String sortOrder; // "asc" 또는 "desc"
 
-    public CommentDto(String content, Long postId, Long parentId) {
+    public CommentDto(String content, Long postId, Long parentId, boolean isPinned, String sortOrder) {
         this.content = content;
         this.postId = postId;
         this.parentId = parentId;
+        this.isPinned = isPinned;
+        this.sortOrder = sortOrder;
     }
 } 

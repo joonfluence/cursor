@@ -1,8 +1,8 @@
 package com.board.service;
 
 import com.board.dto.CommentDto;
-import com.board.entity.Comment;
-import com.board.entity.Post;
+import com.board.entity.CommentEntity;
+import com.board.entity.PostEntity;
 import com.board.repository.CommentRepository;
 import com.board.repository.PostRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -32,15 +32,15 @@ class CommentServiceTest {
     @DisplayName("대댓글 생성 시 parentId가 null이 아니면 저장 가능해야 함")
     void createReply() {
         // given
-        Post post = new Post(null, "테스트 게시글", "테스트 내용", null);
-        Post savedPost = postRepository.save(post);
+        PostEntity post = new PostEntity(null, "테스트 게시글", "테스트 내용", null);
+        PostEntity savedPost = postRepository.save(post);
 
         CommentDto parentCommentDto = CommentDto.builder()
                 .content("부모 댓글")
                 .postId(savedPost.getId())
                 .parentId(null)
                 .build();
-        Comment parentComment = commentService.create(parentCommentDto);
+        CommentEntity parentComment = commentService.create(parentCommentDto);
 
         CommentDto replyCommentDto = CommentDto.builder()
                 .content("대댓글")
@@ -49,7 +49,7 @@ class CommentServiceTest {
                 .build();
 
         // when
-        Comment replyComment = commentService.create(replyCommentDto);
+        CommentEntity replyComment = commentService.create(replyCommentDto);
 
         // then
         assertThat(replyComment.getParentId()).isEqualTo(parentComment.getId());
@@ -60,8 +60,8 @@ class CommentServiceTest {
     @DisplayName("게시글의 댓글 목록 조회")
     void findByPostId() {
         // given
-        Post post = new Post(null, "테스트 게시글", "테스트 내용", null);
-        Post savedPost = postRepository.save(post);
+        PostEntity post = new PostEntity(null, "테스트 게시글", "테스트 내용", null);
+        PostEntity savedPost = postRepository.save(post);
 
         CommentDto commentDto1 = CommentDto.builder()
                 .content("댓글1")
@@ -78,7 +78,7 @@ class CommentServiceTest {
         commentService.create(commentDto2);
 
         // when
-        List<Comment> comments = commentService.findByPostId(savedPost.getId());
+        List<CommentEntity> comments = commentService.findByPostId(savedPost.getId(), "desc");
 
         // then
         assertThat(comments).hasSize(2);
@@ -88,21 +88,21 @@ class CommentServiceTest {
     @DisplayName("댓글 수정")
     void update() {
         // given
-        Post post = new Post(null, "테스트 게시글", "테스트 내용", null);
-        Post savedPost = postRepository.save(post);
+        PostEntity post = new PostEntity(null, "테스트 게시글", "테스트 내용", null);
+        PostEntity savedPost = postRepository.save(post);
 
         CommentDto commentDto = CommentDto.builder()
                 .content("원래 댓글")
                 .postId(savedPost.getId())
                 .parentId(null)
                 .build();
-        Comment savedComment = commentService.create(commentDto);
+        CommentEntity savedComment = commentService.create(commentDto);
 
         // when
         commentService.update(savedComment.getId(), "수정된 댓글");
 
         // then
-        Comment updatedComment = commentRepository.findById(savedComment.getId())
+        CommentEntity updatedComment = commentRepository.findById(savedComment.getId())
                 .orElseThrow();
         assertThat(updatedComment.getContent()).isEqualTo("수정된 댓글");
     }
@@ -111,15 +111,15 @@ class CommentServiceTest {
     @DisplayName("댓글 삭제")
     void delete() {
         // given
-        Post post = new Post(null, "테스트 게시글", "테스트 내용", null);
-        Post savedPost = postRepository.save(post);
+        PostEntity post = new PostEntity(null, "테스트 게시글", "테스트 내용", null);
+        PostEntity savedPost = postRepository.save(post);
 
         CommentDto commentDto = CommentDto.builder()
                 .content("삭제할 댓글")
                 .postId(savedPost.getId())
                 .parentId(null)
                 .build();
-        Comment savedComment = commentService.create(commentDto);
+        CommentEntity savedComment = commentService.create(commentDto);
 
         // when
         commentService.delete(savedComment.getId());
